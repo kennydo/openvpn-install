@@ -235,16 +235,20 @@ else
 	# Generate server.conf
 	echo "port $PORT
 proto udp
+
 dev tun
+
 sndbuf 0
 rcvbuf 0
+
 ca ca.crt
 cert server.crt
 key server.key
 dh dh.pem
 tls-auth ta.key 0
+
 topology subnet
-server 10.8.0.0 255.255.255.0
+server 10.244.0.0 255.255.255.0
 ifconfig-pool-persist ipp.txt" > /etc/openvpn/server.conf
 	echo 'push "redirect-gateway def1 bypass-dhcp"' >> /etc/openvpn/server.conf
 	# DNS
@@ -275,7 +279,11 @@ ifconfig-pool-persist ipp.txt" > /etc/openvpn/server.conf
 		echo 'push "dhcp-option DNS 64.6.65.6"' >> /etc/openvpn/server.conf
 		;;
 	esac
-	echo "keepalive 10 120
+	echo "
+route 10.244.0.0 255.255.0.0
+push \"route 10.244.0.0 255.255.0.0\"
+
+keepalive 10 120
 cipher AES-128-CBC
 comp-lzo
 user nobody
